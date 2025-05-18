@@ -153,15 +153,16 @@
         .action-btn {
             background: none;
             border: none;
-            color: var(--text-color);
+            color: #6B7280;
             cursor: pointer;
-            padding: 0.25rem;
+            padding: 4px;
             border-radius: 4px;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .action-btn:hover {
-            background: rgba(0, 0, 0, 0.1);
+            color: #EF4444;
+            background: rgba(239, 68, 68, 0.1);
         }
 
         /* Progress Circle Styles */
@@ -294,30 +295,34 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
         }
 
         .modal-content {
-            background: var(--card-background);
-            padding: 2rem;
-            border-radius: 15px;
+            background: white;
+            padding: 0;
+            border-radius: 12px;
             width: 90%;
-            max-width: 500px;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
         }
 
         .modal-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 600;
+            color: #1F2937;
+            margin: 0;
         }
 
         .close-modal {
@@ -325,7 +330,13 @@
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: var(--text-color);
+            color: #6B7280;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            color: #EF4444;
         }
 
         .form-group {
@@ -464,6 +475,147 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
+
+        #confirmDeleteBtn:hover {
+            background: #DC2626 !important;
+        }
+
+        /* Add task card drag styles */
+        .task-card.draggable-source--is-dragging {
+            opacity: 0.3;
+        }
+        .task-card.draggable-mirror {
+            opacity: 0.9;
+        }
+
+        /* Add modal styles */
+        const modalStyles = document.createElement('style');
+        modalStyles.textContent = `
+            .modal-content {
+                font-family: 'Roboto', sans-serif;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: #1F2937;
+                margin: 0;
+            }
+
+            .form-group label {
+                font-size: 0.95rem;
+                font-weight: 500;
+                color: #4B5563;
+                margin-bottom: 0.5rem;
+                display: block;
+            }
+
+            .form-group input,
+            .form-group select {
+                font-family: 'Roboto', sans-serif;
+                font-size: 1rem;
+                color: #1F2937;
+                padding: 0.75rem;
+                border: 1px solid #E5E7EB;
+                border-radius: 8px;
+                width: 100%;
+                transition: border-color 0.2s, box-shadow 0.2s;
+                background-color: white;
+            }
+
+            .form-group input:focus,
+            .form-group select:focus {
+                outline: none;
+                border-color: #4F46E5;
+                box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            }
+
+            .form-group select {
+                cursor: pointer;
+                appearance: none;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 0.75rem center;
+                background-size: 1.25rem;
+                padding-right: 2.5rem;
+            }
+
+            .form-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 1rem;
+                margin-top: 2rem;
+            }
+
+            .form-actions button {
+                font-family: 'Roboto', sans-serif;
+                font-size: 0.95rem;
+                font-weight: 500;
+                padding: 0.75rem 1.5rem;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .form-actions button[type="submit"] {
+                background: #4F46E5;
+                color: white;
+                border: none;
+            }
+
+            .form-actions button[type="submit"]:hover {
+                background: #4338CA;
+            }
+
+            .form-actions button[type="button"] {
+                background: white;
+                color: #4B5563;
+                border: 1px solid #E5E7EB;
+            }
+
+            .form-actions button[type="button"]:hover {
+                background: #F9FAFB;
+                border-color: #D1D5DB;
+            }
+
+            #taskForm {
+                padding: 1.5rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.25rem;
+            }
+
+            #recurringOptions {
+                margin-top: 1.25rem;
+                padding-top: 1.25rem;
+                border-top: 1px solid #E5E7EB;
+            }
+
+            .modal-header {
+                padding: 1.25rem 1.5rem;
+                border-bottom: 1px solid #E5E7EB;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .close-modal {
+                background: none;
+                border: none;
+                color: #6B7280;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0.25rem;
+                line-height: 1;
+                transition: color 0.2s;
+            }
+
+            .close-modal:hover {
+                color: #4B5563;
+            }
+        `;
+        document.head.appendChild(modalStyles);
     </style>
 </head>
 <body>
@@ -501,7 +653,7 @@
             <div class="task-list" id="recurring-task-list">
                 <!-- Recurring tasks will be added here -->
             </div>
-            <button class="add-task-btn" onclick="showAddTaskModal('recurring')">
+            <button class="add-task-btn" onclick="openRecurringTaskModal()">
                 <i class="fas fa-plus"></i>
                 Add Recurring Task
             </button>
@@ -597,13 +749,13 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div class="modal" id="deleteConfirmModal" style="display: none;">
-        <div class="modal-content" style="max-width: 400px;">
+    <div class="modal" id="deleteConfirmModal">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Confirm Delete</h2>
-                <button class="close-modal" onclick="closeDeleteModal()">×</button>
+                <h2 class="modal-title">Delete Task</h2>
+                <button class="close-modal" onclick="closeDeleteModal()">&times;</button>
             </div>
-            <div style="padding: 1rem;">
+            <div style="padding: 1.5rem;">
                 <p id="deleteConfirmText" style="margin-bottom: 1.5rem;">Are you sure you want to delete this task?</p>
                 <div style="display: flex; justify-content: flex-end; gap: 1rem;">
                     <button onclick="closeDeleteModal()" style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #e5e7eb; background: white; cursor: pointer;">Cancel</button>
@@ -727,6 +879,16 @@
         // Save tasks to localStorage
         function saveTasks() {
             localStorage.setItem('tasks', JSON.stringify(tasks));
+            updateAllColumns();
+        }
+
+        // Show add task modal for recurring tasks
+        function openRecurringTaskModal() {
+            currentColumn = 'recurring';
+            const modal = document.getElementById('addTaskModal');
+            const recurringOptions = document.getElementById('recurringOptions');
+            recurringOptions.style.display = 'block';
+            modal.style.display = 'flex';
         }
 
         // Show add task modal
@@ -764,47 +926,74 @@
 
             tasks[currentColumn].push(task);
             saveTasks();
-            updateAllColumns();
             closeModal();
         }
 
         // Delete task functions
         function showDeleteConfirmation(taskId) {
+            console.log('Showing delete confirmation for task:', taskId);
             const taskToDelete = findTaskById(taskId);
-            if (!taskToDelete) return;
+            if (!taskToDelete) {
+                console.log('Task not found:', taskId);
+                return;
+            }
 
             const modal = document.getElementById('deleteConfirmModal');
             const confirmText = document.getElementById('deleteConfirmText');
             const confirmBtn = document.getElementById('confirmDeleteBtn');
 
             confirmText.textContent = `Are you sure you want to delete "${taskToDelete.title}"?`;
+            confirmBtn.setAttribute('data-task-id', taskId);
             modal.style.display = 'flex';
 
-            // Remove any existing click handler
-            confirmBtn.onclick = null;
-            // Add new click handler
-            confirmBtn.onclick = () => {
-                deleteTask(taskId);
-                closeDeleteModal();
+            // Close modal when clicking outside
+            modal.onclick = function(event) {
+                if (event.target === modal) {
+                    closeDeleteModal();
+                }
             };
         }
 
         function closeDeleteModal() {
-            document.getElementById('deleteConfirmModal').style.display = 'none';
+            const modal = document.getElementById('deleteConfirmModal');
+            modal.style.display = 'none';
         }
 
         function deleteTask(taskId) {
+            console.log('Deleting task:', taskId);
+            taskId = parseInt(taskId);
             // Find which column contains the task
             for (const columnId in tasks) {
-                const index = tasks[columnId].findIndex(task => task.id.toString() === taskId.toString());
+                const index = tasks[columnId].findIndex(task => task.id === taskId);
                 if (index !== -1) {
                     tasks[columnId].splice(index, 1);
+                    saveTasks();
+                    updateAllColumns();
                     break;
                 }
             }
-            saveTasks();
-            updateAllColumns();
         }
+
+        // Initialize delete confirmation
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMockData(); // Initialize mock data if needed
+            loadTasks();
+            initializeDragAndDrop();
+            updateAllColumns(); // Initial update
+
+            // Add event listener for delete confirmation
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            confirmDeleteBtn.addEventListener('click', function() {
+                const taskId = this.getAttribute('data-task-id');
+                if (taskId) {
+                    deleteTask(taskId);
+                    closeDeleteModal();
+                }
+            });
+
+            setInterval(updateAllColumns, 60000); // Update times every minute
+            setInterval(checkRecurringTasks, 300000); // Check recurring tasks every 5 minutes
+        });
 
         // Find task by ID
         function findTaskById(taskId) {
@@ -813,6 +1002,109 @@
                 if (task) return task;
             }
             return null;
+        }
+
+        // Initialize drag and drop
+        function initializeDragAndDrop() {
+            try {
+                const taskLists = document.querySelectorAll('.task-list');
+                let draggedTask = null;
+                let sourceColumn = null;
+
+                // Add drag and drop event listeners to each task list
+                taskLists.forEach(taskList => {
+                    // Allow dropping
+                    taskList.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                    });
+
+                    // Handle drop
+                    taskList.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        if (!draggedTask || !sourceColumn) return;
+
+                        const targetColumn = e.currentTarget.closest('.task-column');
+                        if (!targetColumn) return;
+
+                        const targetColumnId = targetColumn.id.replace('-tasks', '');
+                        const sourceColumnId = sourceColumn.id.replace('-tasks', '');
+
+                        if (sourceColumnId !== targetColumnId) {
+                            // Find and move the task
+                            const taskId = draggedTask.dataset.id;
+                            const taskIndex = tasks[sourceColumnId].findIndex(t => t.id.toString() === taskId);
+                            
+                            if (taskIndex !== -1) {
+                                const task = tasks[sourceColumnId][taskIndex];
+                                tasks[sourceColumnId].splice(taskIndex, 1);
+                                tasks[targetColumnId].push(task);
+
+                                // Save changes
+                                localStorage.setItem('tasks', JSON.stringify(tasks));
+
+                                // Update UI
+                                updateAllColumns();
+                            }
+                        }
+
+                        // Reset drag state
+                        draggedTask = null;
+                        sourceColumn = null;
+                    });
+                });
+
+                // Add drag start listener to document for task cards
+                document.addEventListener('dragstart', (e) => {
+                    const taskCard = e.target.closest('.task-card');
+                    if (!taskCard) return;
+
+                    // Don't start drag if clicking action buttons
+                    if (e.target.closest('.task-actions')) {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    draggedTask = taskCard;
+                    sourceColumn = taskCard.closest('.task-column');
+                    e.dataTransfer.effectAllowed = 'move';
+                    
+                    // Add dragging class
+                    taskCard.classList.add('dragging');
+                });
+
+                // Add drag end listener to document
+                document.addEventListener('dragend', (e) => {
+                    const taskCard = e.target.closest('.task-card');
+                    if (taskCard) {
+                        taskCard.classList.remove('dragging');
+                    }
+                });
+
+            } catch (error) {
+                console.log('Error initializing drag and drop:', error);
+            }
+        }
+
+        // Update column
+        function updateColumn(columnId) {
+            const column = document.getElementById(`${columnId}-tasks`);
+            if (!column) return;
+
+            const taskList = document.getElementById(`${columnId}-task-list`);
+            const taskCount = column.querySelector('.task-count');
+            
+            if (taskList && tasks[columnId]) {
+                // Update task list
+                taskList.innerHTML = tasks[columnId].map(task => 
+                    createTaskCard(task)
+                ).join('');
+                
+                // Update count
+                if (taskCount) {
+                    taskCount.textContent = tasks[columnId].length.toString();
+                }
+            }
         }
 
         // Create task card
@@ -827,7 +1119,7 @@
                     <div class="task-header">
                         <h3 class="task-title">${task.title}</h3>
                         <div class="task-actions">
-                            <button class="action-btn" onclick="showDeleteConfirmation(${task.id})">
+                            <button class="action-btn" onclick="event.preventDefault(); event.stopPropagation(); showDeleteConfirmation(${task.id});">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -851,27 +1143,11 @@
             `;
         }
 
-        // Update column
-        function updateColumn(columnId) {
-            const column = document.getElementById(`${columnId}-tasks`);
-            if (!column) return;
-
-            const taskList = document.getElementById(`${columnId}-task-list`);
-            const taskCount = column.querySelector('.task-count');
-            
-            if (taskList && tasks[columnId]) {
-                taskList.innerHTML = tasks[columnId].map(task => createTaskCard(task)).join('');
-                if (taskCount) {
-                    taskCount.textContent = tasks[columnId].length;
-                }
-            }
-        }
-
         // Update all columns
         function updateAllColumns() {
-            updateColumn('active');
-            updateColumn('recurring');
-            updateColumn('completed');
+            ['active', 'recurring', 'completed'].forEach(columnId => {
+                updateColumn(columnId);
+            });
         }
 
         // Start Pomodoro session
@@ -886,33 +1162,6 @@
                 }));
                 window.location.href = 'pomodoro.html';
             }
-        }
-
-        // Initialize drag and drop
-        function initializeDragAndDrop() {
-            const draggable = new Draggable.Sortable(document.querySelectorAll('.task-list'), {
-                draggable: '.task-card',
-                mirror: {
-                    constrainDimensions: true,
-                }
-            });
-
-            draggable.on('drag:stop', (event) => {
-                const taskId = event.data.source.dataset.id;
-                const sourceColumn = event.data.source.closest('.task-column').id.replace('-tasks', '');
-                const targetColumn = event.data.over.closest('.task-column').id.replace('-tasks', '');
-
-                if (sourceColumn !== targetColumn) {
-                    const taskIndex = tasks[sourceColumn].findIndex(t => t.id.toString() === taskId);
-                    const task = tasks[sourceColumn][taskIndex];
-                    
-                    tasks[sourceColumn].splice(taskIndex, 1);
-                    tasks[targetColumn].push(task);
-                    
-                    saveTasks();
-                    updateAllColumns();
-                }
-            });
         }
 
         // Check and reset recurring tasks
@@ -944,85 +1193,6 @@
             saveTasks();
             updateColumn('recurring');
         }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeMockData(); // Initialize mock data if needed
-            loadTasks();
-            initializeDragAndDrop();
-            updateAllColumns(); // Initial update
-            setInterval(updateAllColumns, 60000); // Update times every minute
-            setInterval(checkRecurringTasks, 300000); // Check recurring tasks every 5 minutes
-        });
-
-        // Add some CSS for delete button hover effect
-        const style = document.createElement('style');
-        style.textContent = `
-            .action-btn {
-                background: none;
-                border: none;
-                color: #6B7280;
-                cursor: pointer;
-                padding: 4px;
-                border-radius: 4px;
-                transition: all 0.2s;
-            }
-            .action-btn:hover {
-                color: #EF4444;
-                background: rgba(239, 68, 68, 0.1);
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Add CSS for delete confirmation modal
-        const deleteModalStyle = document.createElement('style');
-        deleteModalStyle.textContent = `
-            .modal {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                justify-content: center;
-                align-items: center;
-                z-index: 1000;
-            }
-
-            .modal-content {
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                max-width: 500px;
-                width: 90%;
-            }
-
-            .modal-header {
-                padding: 1rem;
-                border-bottom: 1px solid #e5e7eb;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .close-modal {
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: #6B7280;
-            }
-
-            .close-modal:hover {
-                color: #EF4444;
-            }
-
-            #confirmDeleteBtn:hover {
-                background: #DC2626;
-            }
-        `;
-        document.head.appendChild(deleteModalStyle);
 
         // Analysis Functions
         function toggleAnalysis() {
@@ -1157,15 +1327,6 @@
             document.getElementById('taskDistribution').textContent = 
                 `${distribution.urgent}% Urgent, ${distribution.warning}% Important, ${distribution.normal}% Normal`;
         }
-
-        // Update analytics when tasks change
-        const originalSaveTasks = saveTasks;
-        saveTasks = function() {
-            originalSaveTasks();
-            if (document.getElementById('analysisSection').style.display !== 'none') {
-                updateAnalytics();
-            }
-        };
     </script>
 </body>
 </html> 
