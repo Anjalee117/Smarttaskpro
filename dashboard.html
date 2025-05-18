@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartTask Pro Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #06B6D4;
+            --background-color: #F3F4F6;
+            --card-background: #FFFFFF;
+            --text-color: #1F2937;
+            --gradient-1: linear-gradient(135deg, #4F46E5, #06B6D4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--card-background);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Profile Button Styles */
+        .profile-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+        }
+
+        .profile-btn i {
+            font-size: 1.2rem;
+        }
+
+        .profile-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        /* Profile Modal Styles */
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: var(--card-background);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            min-width: 300px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-modal h3 {
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .profile-info {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            background: var(--background-color);
+        }
+
+        .profile-info label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.25rem;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .profile-info span {
+            color: var(--text-color);
+            font-size: 1rem;
+            display: block;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            padding: 2rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .feature-description {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1 class="logo">SmartTask Pro</h1>
+        <div class="user-info">
+            <button class="profile-btn" onclick="toggleProfile()">
+                <i class="fas fa-user"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Profile Modal -->
+    <div class="profile-modal" id="profileModal">
+        <h3>Profile Information</h3>
+        <div class="profile-info">
+            <label>Username</label>
+            <span id="profileUsername"></span>
+        </div>
+        <div class="profile-info">
+            <label>Account Created</label>
+            <span id="profileCreated"></span>
+        </div>
+        <div class="profile-info">
+            <label>Account Age</label>
+            <span id="accountAge"></span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="features-grid">
+            <!-- To-Do List -->
+            <div class="feature-card" onclick="window.location.href='todo.html'">
+                <div class="feature-icon">
+                    <i class="fas fa-list-check"></i>
+                </div>
+                <h3 class="feature-title">Smart To-Do List</h3>
+                <p class="feature-description">
+                    Dynamic task management with AI-powered prioritization and progress tracking
+                </p>
+            </div>
+
+            <!-- Pomodoro Timer -->
+            <div class="feature-card" onclick="window.location.href='pomodoro.html'">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="feature-title">Pomodoro Timer</h3>
+                <p class="feature-description">
+                    Customizable work intervals with productivity analytics
+                </p>
+            </div>
+
+            <!-- AI Assistant -->
+            <div class="feature-card" onclick="window.location.href='ai-assistant.html'">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="feature-title">AI Assistant</h3>
+                <p class="feature-description">
+                    Smart scheduling and natural language task creation
+                </p>
+            </div>
+
+                        <!-- PDF/PPT Manager -->            <div class="feature-card" onclick="window.location.href='document-manager.html'">                <div class="feature-icon">                    <i class="fas fa-file-pdf"></i>                </div>                <h3 class="feature-title">Document Manager</h3>                <p class="feature-description">                    Integrated PDF/PPT management with OCR search                </p>            </div>
+        </div>
+    </main>
+
+    <script>
+        // Check if user is logged in and update profile information
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get user data from localStorage
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (!currentUser) {
+                window.location.href = 'signin.html';
+                return;
+            }
+
+            const username = currentUser.username;
+            const userData = users[username];
+
+            if (!userData) {
+                console.error('User data not found');
+                return;
+            }
+
+            // Format the creation date nicely
+            const createdDate = new Date(userData.createdAt);
+            const formattedCreationDate = createdDate.toLocaleString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // Calculate account age
+            const now = new Date();
+            const ageInMilliseconds = now - createdDate;
+            const days = Math.floor(ageInMilliseconds / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((ageInMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((ageInMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
+
+            // Format current date
+            const currentDate = now.toLocaleString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // Update profile information
+            document.getElementById('profileUsername').textContent = username;
+            document.getElementById('profileCreated').textContent = formattedCreationDate;
+            document.getElementById('accountAge').textContent = 
+                `${days} days, ${hours} hours, ${minutes} minutes (as of ${currentDate})`;
+        });
+
+        // Toggle profile modal
+        function toggleProfile() {
+            const modal = document.getElementById('profileModal');
+            if (modal.style.display === 'block') {
+                modal.style.display = 'none';
+            } else {
+                modal.style.display = 'block';
+                
+                // Update the account age in real-time
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                const userData = users[currentUser.username];
+                
+                const createdDate = new Date(userData.createdAt);
+                const now = new Date();
+                const ageInMilliseconds = now - createdDate;
+                const days = Math.floor(ageInMilliseconds / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((ageInMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((ageInMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
+                
+                const currentDate = now.toLocaleString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                document.getElementById('accountAge').textContent = 
+                    `${days} days, ${hours} hours, ${minutes} minutes (as of ${currentDate})`;
+            }
+        }
+
+        // Close profile modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('profileModal');
+            const profileBtn = document.querySelector('.profile-btn');
+            
+            if (!modal.contains(event.target) && !profileBtn.contains(event.target)) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 
