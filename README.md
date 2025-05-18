@@ -236,8 +236,8 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 | <img src="https://github.com/yourusername.png" width="100" alt="Profile"/> |
 |:---:|
-| **Your Name** |
-| 🌐 [GitHub](https://github.com/yourusername) |
+| **Anjalee** |
+| 🌐 [GitHub](https://github.com/Anjalee117) |
 
 </div>
 
@@ -264,7 +264,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 <div align="center">
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by Anjalee and supported by ai.
 
 <a href="#-smarttask-pro">Back to top ⬆️</a>
 
