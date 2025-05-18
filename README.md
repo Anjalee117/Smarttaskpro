@@ -234,7 +234,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 <div align="center">
 
-| <img src="https://github.com/yourusername.png" width="100" alt="Profile"/> |
+| <img src="https://github.com/Anjalee117.png" width="100" alt="Profile"/> |
 |:---:|
 | **Anjalee** |
 | 🌐 [GitHub](https://github.com/Anjalee117) |
