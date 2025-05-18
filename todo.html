@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart To-Do List - SmartTask Pro</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Include drag and drop library -->
+    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.js"></script>
+
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #06B6D4;
+            --background-color: #F3F4F6;
+            --card-background: #FFFFFF;
+            --text-color: #1F2937;
+            --urgent-color: #EF4444;
+            --warning-color: #F59E0B;
+            --success-color: #10B981;
+            --gradient-1: linear-gradient(135deg, #4F46E5, #06B6D4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--card-background);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            display: flex;
+            gap: 2rem;
+            overflow-x: auto;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Task Column Styles */
+        .task-column {
+            background: var(--card-background);
+            border-radius: 15px;
+            padding: 1.5rem;
+            min-width: 350px;
+            max-width: 350px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .column-header {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .column-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .task-count {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        /* Task Card Styles */
+        .task-card {
+            background: var(--background-color);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: move;
+            transition: transform 0.2s;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-title {
+            font-weight: 500;
+            margin-right: 1rem;
+        }
+
+        /* Task Actions */
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Progress Circle Styles */
+        .progress-circle {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .progress-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .progress-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-circle circle {
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
+        .progress-circle .background {
+            stroke: #e5e7eb;
+        }
+
+        .progress-circle .progress {
+            stroke: var(--primary-color);
+            transition: stroke-dashoffset 0.3s;
+        }
+
+        .time-remaining {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-color);
+            white-space: nowrap;
+        }
+
+        /* Task Metadata */
+        .task-metadata {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .task-tags {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .task-tag {
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .tag-urgent {
+            background: var(--urgent-color);
+            color: white;
+        }
+
+        .tag-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .tag-normal {
+            background: var(--success-color);
+            color: white;
+        }
+
+        /* Task Card Hover Effects */
+        .task-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .task-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        /* Add Task Button */
+        .add-task-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--gradient-1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: opacity 0.3s;
+        }
+
+        .add-task-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Task Form Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .task-column {
+                min-width: 100%;
+            }
+        }
+
+        /* Analysis Section Styles */
+        .analysis-section {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .close-analysis {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6B7280;
+        }
+
+        .analysis-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .chart-container {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 10px;
+            height: 300px;
+        }
+
+        .analysis-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #4B5563;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: #1F2937;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .analysis-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 10px rgba(79, 70, 229, 0.3);
+            transition: all 0.3s;
+        }
+
+        .analysis-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Overlay for analysis section */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1 class="logo">SmartTask Pro</h1>
+        <button onclick="window.location.href='dashboard.html'" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Active Tasks Column -->
+        <div class="task-column" id="active-tasks">
+            <div class="column-header">
+                <h2 class="column-title">Active Tasks</h2>
+                <span class="task-count">0</span>
+            </div>
+            <div class="task-list" id="active-task-list">
+                <!-- Active tasks will be added here -->
+            </div>
+            <button class="add-task-btn" onclick="openModal()">
+                <i class="fas fa-plus"></i> Add Task
+            </button>
+        </div>
+
+        <!-- Recurring Tasks Column -->
+        <div class="task-column" id="recurring-tasks">
+            <div class="column-header">
+                <h2 class="column-title">Recurring Tasks</h2>
+                <span class="task-count">0</span>
+            </div>
+            <div class="task-list" id="recurring-task-list">
+                <!-- Recurring tasks will be added here -->
+            </div>
+            <button class="add-task-btn" onclick="showAddTaskModal('recurring')">
+                <i class="fas fa-plus"></i>
+                Add Recurring Task
+            </button>
+        </div>
+
+        <!-- Completed Tasks Column -->
+        <div class="task-column" id="completed-tasks">
+            <div class="column-header">
+                <h2 class="column-title">Completed Tasks</h2>
+                <span class="task-count">0</span>
+            </div>
+            <div class="task-list" id="completed-task-list">
+                <!-- Completed tasks will be added here -->
+            </div>
+        </div>
+
+        <!-- AI Analysis Section -->
+        <div class="analysis-section" id="analysisSection" style="display: none;">
+            <div class="analysis-header">
+                <h2>AI Task Analysis</h2>
+                <button class="close-analysis" onclick="toggleAnalysis()">×</button>
+            </div>
+            <div class="analysis-content">
+                <div class="chart-container">
+                    <canvas id="taskDistributionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="productivityChart"></canvas>
+                </div>
+                <div class="analysis-stats">
+                    <div class="stat-card">
+                        <h3>Task Completion Rate</h3>
+                        <p id="completionRate">0%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Most Productive Time</h3>
+                        <p id="productiveTime">--</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Task Distribution</h3>
+                        <p id="taskDistribution">--</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Analysis Button -->
+        <button class="analysis-btn" onclick="toggleAnalysis()">
+            <i class="fas fa-chart-line"></i> Show Analysis
+        </button>
+    </main>
+
+    <!-- Add Task Modal -->
+    <div class="modal" id="addTaskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Task</h2>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <form id="taskForm" onsubmit="handleAddTask(event)">
+                <div class="form-group">
+                    <label for="taskTitle">Task Title</label>
+                    <input type="text" id="taskTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDuration">Duration (hours)</label>
+                    <input type="number" id="taskDuration" min="0.5" step="0.5" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskUrgency">Urgency Level</label>
+                    <select id="taskUrgency" required>
+                        <option value="normal">Normal</option>
+                        <option value="warning">Important</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                <div id="recurringOptions" style="display: none;">
+                    <div class="form-group">
+                        <label for="taskInterval">Repeat Interval</label>
+                        <select id="taskInterval" required>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions" style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" onclick="closeModal()" style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #e5e7eb; background: white; cursor: pointer;">Cancel</button>
+                    <button type="submit" style="padding: 0.5rem 1rem; border-radius: 8px; border: none; background: var(--primary-color); color: white; cursor: pointer;">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteConfirmModal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Confirm Delete</h2>
+                <button class="close-modal" onclick="closeDeleteModal()">×</button>
+            </div>
+            <div style="padding: 1rem;">
+                <p id="deleteConfirmText" style="margin-bottom: 1.5rem;">Are you sure you want to delete this task?</p>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+                    <button onclick="closeDeleteModal()" style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #e5e7eb; background: white; cursor: pointer;">Cancel</button>
+                    <button id="confirmDeleteBtn" style="padding: 0.5rem 1rem; border-radius: 8px; border: none; background: #EF4444; color: white; cursor: pointer;">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentColumn = 'active';
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || {
+            active: [],
+            recurring: [],
+            completed: []
+        };
+
+        // Initialize mock data if no tasks exist
+        function initializeMockData() {
+            // Only initialize if all task lists are empty
+            if (tasks.active.length === 0 && tasks.recurring.length === 0 && tasks.completed.length === 0) {
+                const now = Date.now();
+                const hour = 3600000; // 1 hour in milliseconds
+
+                // Sample active tasks
+                tasks.active = [
+                    {
+                        id: now,
+                        title: "Complete Project Presentation",
+                        duration: 2 * hour,
+                        urgency: "urgent",
+                        startTime: now,
+                        completed: false
+                    },
+                    {
+                        id: now + 1,
+                        title: "Review Code Changes",
+                        duration: 1.5 * hour,
+                        urgency: "warning",
+                        startTime: now,
+                        completed: false
+                    },
+                    {
+                        id: now + 2,
+                        title: "Read Documentation",
+                        duration: 1 * hour,
+                        urgency: "normal",
+                        startTime: now,
+                        completed: false
+                    }
+                ];
+
+                // Sample recurring tasks
+                tasks.recurring = [
+                    {
+                        id: now + 3,
+                        title: "Team Stand-up Meeting",
+                        duration: 0.5 * hour,
+                        urgency: "warning",
+                        startTime: now,
+                        completed: false,
+                        interval: "daily",
+                        lastReset: now
+                    },
+                    {
+                        id: now + 4,
+                        title: "Weekly Progress Report",
+                        duration: 1 * hour,
+                        urgency: "urgent",
+                        startTime: now,
+                        completed: false,
+                        interval: "weekly",
+                        lastReset: now
+                    },
+                    {
+                        id: now + 5,
+                        title: "Monthly Goals Review",
+                        duration: 2 * hour,
+                        urgency: "normal",
+                        startTime: now,
+                        completed: false,
+                        interval: "monthly",
+                        lastReset: now
+                    }
+                ];
+
+                // Sample completed tasks
+                tasks.completed = [
+                    {
+                        id: now + 6,
+                        title: "Initial Project Setup",
+                        duration: 1 * hour,
+                        urgency: "normal",
+                        startTime: now - (2 * hour),
+                        completed: true
+                    },
+                    {
+                        id: now + 7,
+                        title: "Client Meeting Notes",
+                        duration: 0.5 * hour,
+                        urgency: "warning",
+                        startTime: now - (1 * hour),
+                        completed: true
+                    }
+                ];
+
+                // Save mock data to localStorage
+                saveTasks();
+            }
+        }
+
+        // Load tasks from localStorage
+        function loadTasks() {
+            const savedTasks = localStorage.getItem('tasks');
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+                updateAllColumns();
+            }
+        }
+
+        // Save tasks to localStorage
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Show add task modal
+        function openModal() {
+            currentColumn = 'active';
+            const modal = document.getElementById('addTaskModal');
+            const recurringOptions = document.getElementById('recurringOptions');
+            recurringOptions.style.display = 'none';
+            modal.style.display = 'flex';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('addTaskModal').style.display = 'none';
+            document.getElementById('taskForm').reset();
+        }
+
+        // Handle adding new task
+        function handleAddTask(event) {
+            event.preventDefault();
+
+            const task = {
+                id: Date.now(),
+                title: document.getElementById('taskTitle').value,
+                duration: document.getElementById('taskDuration').value * 3600000, // Convert hours to milliseconds
+                urgency: document.getElementById('taskUrgency').value,
+                startTime: Date.now(),
+                completed: false
+            };
+
+            if (currentColumn === 'recurring') {
+                task.interval = document.getElementById('taskInterval').value;
+                task.lastReset = Date.now();
+            }
+
+            tasks[currentColumn].push(task);
+            saveTasks();
+            updateAllColumns();
+            closeModal();
+        }
+
+        // Delete task functions
+        function showDeleteConfirmation(taskId) {
+            const taskToDelete = findTaskById(taskId);
+            if (!taskToDelete) return;
+
+            const modal = document.getElementById('deleteConfirmModal');
+            const confirmText = document.getElementById('deleteConfirmText');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+            confirmText.textContent = `Are you sure you want to delete "${taskToDelete.title}"?`;
+            modal.style.display = 'flex';
+
+            // Remove any existing click handler
+            confirmBtn.onclick = null;
+            // Add new click handler
+            confirmBtn.onclick = () => {
+                deleteTask(taskId);
+                closeDeleteModal();
+            };
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteConfirmModal').style.display = 'none';
+        }
+
+        function deleteTask(taskId) {
+            // Find which column contains the task
+            for (const columnId in tasks) {
+                const index = tasks[columnId].findIndex(task => task.id.toString() === taskId.toString());
+                if (index !== -1) {
+                    tasks[columnId].splice(index, 1);
+                    break;
+                }
+            }
+            saveTasks();
+            updateAllColumns();
+        }
+
+        // Find task by ID
+        function findTaskById(taskId) {
+            for (const columnId in tasks) {
+                const task = tasks[columnId].find(task => task.id.toString() === taskId.toString());
+                if (task) return task;
+            }
+            return null;
+        }
+
+        // Create task card
+        function createTaskCard(task) {
+            const timeLeft = task.duration - (Date.now() - task.startTime);
+            const hoursLeft = Math.max(0, Math.floor(timeLeft / 3600000));
+            const minutesLeft = Math.max(0, Math.floor((timeLeft % 3600000) / 60000));
+            const progress = Math.max(0, Math.min(1, timeLeft / task.duration));
+
+            return `
+                <div class="task-card" data-id="${task.id}" draggable="true">
+                    <div class="task-header">
+                        <h3 class="task-title">${task.title}</h3>
+                        <div class="task-actions">
+                            <button class="action-btn" onclick="showDeleteConfirmation(${task.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="task-metadata">
+                        <div class="task-tags">
+                            <span class="task-tag tag-${task.urgency}">${task.urgency}</span>
+                            ${task.interval ? `<span class="task-tag tag-normal">${task.interval}</span>` : ''}
+                        </div>
+                        <div class="progress-circle">
+                            <svg width="40" height="40">
+                                <circle class="background" cx="20" cy="20" r="15" />
+                                <circle class="progress" cx="20" cy="20" r="15"
+                                    stroke-dasharray="94.2"
+                                    stroke-dashoffset="${94.2 * (1 - progress)}" />
+                            </svg>
+                            <span class="time-remaining">${hoursLeft}h${minutesLeft}m</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Update column
+        function updateColumn(columnId) {
+            const column = document.getElementById(`${columnId}-tasks`);
+            if (!column) return;
+
+            const taskList = document.getElementById(`${columnId}-task-list`);
+            const taskCount = column.querySelector('.task-count');
+            
+            if (taskList && tasks[columnId]) {
+                taskList.innerHTML = tasks[columnId].map(task => createTaskCard(task)).join('');
+                if (taskCount) {
+                    taskCount.textContent = tasks[columnId].length;
+                }
+            }
+        }
+
+        // Update all columns
+        function updateAllColumns() {
+            updateColumn('active');
+            updateColumn('recurring');
+            updateColumn('completed');
+        }
+
+        // Start Pomodoro session
+        function startPomodoro(taskId) {
+            const task = tasks.active.find(t => t.id.toString() === taskId) ||
+                         tasks.recurring.find(t => t.id.toString() === taskId);
+            if (task) {
+                localStorage.setItem('currentPomodoroTask', JSON.stringify({
+                    id: task.id,
+                    title: task.title,
+                    startTime: Date.now()
+                }));
+                window.location.href = 'pomodoro.html';
+            }
+        }
+
+        // Initialize drag and drop
+        function initializeDragAndDrop() {
+            const draggable = new Draggable.Sortable(document.querySelectorAll('.task-list'), {
+                draggable: '.task-card',
+                mirror: {
+                    constrainDimensions: true,
+                }
+            });
+
+            draggable.on('drag:stop', (event) => {
+                const taskId = event.data.source.dataset.id;
+                const sourceColumn = event.data.source.closest('.task-column').id.replace('-tasks', '');
+                const targetColumn = event.data.over.closest('.task-column').id.replace('-tasks', '');
+
+                if (sourceColumn !== targetColumn) {
+                    const taskIndex = tasks[sourceColumn].findIndex(t => t.id.toString() === taskId);
+                    const task = tasks[sourceColumn][taskIndex];
+                    
+                    tasks[sourceColumn].splice(taskIndex, 1);
+                    tasks[targetColumn].push(task);
+                    
+                    saveTasks();
+                    updateAllColumns();
+                }
+            });
+        }
+
+        // Check and reset recurring tasks
+        function checkRecurringTasks() {
+            const now = Date.now();
+            tasks.recurring.forEach(task => {
+                const timeSinceReset = now - task.lastReset;
+                let shouldReset = false;
+
+                switch(task.interval) {
+                    case 'daily':
+                        shouldReset = timeSinceReset >= 86400000; // 24 hours
+                        break;
+                    case 'weekly':
+                        shouldReset = timeSinceReset >= 604800000; // 7 days
+                        break;
+                    case 'monthly':
+                        shouldReset = timeSinceReset >= 2592000000; // 30 days
+                        break;
+                }
+
+                if (shouldReset) {
+                    task.lastReset = now;
+                    task.startTime = now;
+                    task.completed = false;
+                }
+            });
+
+            saveTasks();
+            updateColumn('recurring');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMockData(); // Initialize mock data if needed
+            loadTasks();
+            initializeDragAndDrop();
+            updateAllColumns(); // Initial update
+            setInterval(updateAllColumns, 60000); // Update times every minute
+            setInterval(checkRecurringTasks, 300000); // Check recurring tasks every 5 minutes
+        });
+
+        // Add some CSS for delete button hover effect
+        const style = document.createElement('style');
+        style.textContent = `
+            .action-btn {
+                background: none;
+                border: none;
+                color: #6B7280;
+                cursor: pointer;
+                padding: 4px;
+                border-radius: 4px;
+                transition: all 0.2s;
+            }
+            .action-btn:hover {
+                color: #EF4444;
+                background: rgba(239, 68, 68, 0.1);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add CSS for delete confirmation modal
+        const deleteModalStyle = document.createElement('style');
+        deleteModalStyle.textContent = `
+            .modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+
+            .modal-content {
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                max-width: 500px;
+                width: 90%;
+            }
+
+            .modal-header {
+                padding: 1rem;
+                border-bottom: 1px solid #e5e7eb;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .close-modal {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #6B7280;
+            }
+
+            .close-modal:hover {
+                color: #EF4444;
+            }
+
+            #confirmDeleteBtn:hover {
+                background: #DC2626;
+            }
+        `;
+        document.head.appendChild(deleteModalStyle);
+
+        // Analysis Functions
+        function toggleAnalysis() {
+            const analysisSection = document.getElementById('analysisSection');
+            const currentDisplay = analysisSection.style.display;
+            
+            if (currentDisplay === 'none') {
+                analysisSection.style.display = 'block';
+                updateAnalytics();
+            } else {
+                analysisSection.style.display = 'none';
+            }
+        }
+
+        function updateAnalytics() {
+            updateTaskDistributionChart();
+            updateProductivityChart();
+            updateStats();
+        }
+
+        function updateTaskDistributionChart() {
+            const ctx = document.getElementById('taskDistributionChart').getContext('2d');
+            
+            // Count tasks by urgency
+            const urgencyCounts = {
+                urgent: 0,
+                warning: 0,
+                normal: 0
+            };
+
+            [...tasks.active, ...tasks.recurring].forEach(task => {
+                urgencyCounts[task.urgency]++;
+            });
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Urgent', 'Important', 'Normal'],
+                    datasets: [{
+                        data: [
+                            urgencyCounts.urgent,
+                            urgencyCounts.warning,
+                            urgencyCounts.normal
+                        ],
+                        backgroundColor: [
+                            '#EF4444',
+                            '#F59E0B',
+                            '#10B981'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Task Distribution by Priority'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateProductivityChart() {
+            const ctx = document.getElementById('productivityChart').getContext('2d');
+            
+            // Calculate completed tasks per day for the last 7 days
+            const last7Days = Array.from({length: 7}, (_, i) => {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                return date.toLocaleDateString('en-US', { weekday: 'short' });
+            }).reverse();
+
+            // Mock data for completed tasks (replace with actual data in production)
+            const completedPerDay = [4, 6, 3, 7, 5, 4, 6];
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: last7Days,
+                    datasets: [{
+                        label: 'Completed Tasks',
+                        data: completedPerDay,
+                        borderColor: '#4F46E5',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Productivity Trend'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateStats() {
+            // Calculate completion rate
+            const totalTasks = tasks.active.length + tasks.completed.length;
+            const completionRate = totalTasks ? Math.round((tasks.completed.length / totalTasks) * 100) : 0;
+            document.getElementById('completionRate').textContent = `${completionRate}%`;
+
+            // Set most productive time (mock data - replace with actual analysis)
+            document.getElementById('productiveTime').textContent = '2:00 PM - 4:00 PM';
+
+            // Calculate task distribution
+            const totalActiveTasks = tasks.active.length + tasks.recurring.length;
+            const distribution = totalActiveTasks ? {
+                urgent: Math.round((tasks.active.filter(t => t.urgency === 'urgent').length / totalActiveTasks) * 100),
+                warning: Math.round((tasks.active.filter(t => t.urgency === 'warning').length / totalActiveTasks) * 100),
+                normal: Math.round((tasks.active.filter(t => t.urgency === 'normal').length / totalActiveTasks) * 100)
+            } : { urgent: 0, warning: 0, normal: 0 };
+
+            document.getElementById('taskDistribution').textContent = 
+                `${distribution.urgent}% Urgent, ${distribution.warning}% Important, ${distribution.normal}% Normal`;
+        }
+
+        // Update analytics when tasks change
+        const originalSaveTasks = saveTasks;
+        saveTasks = function() {
+            originalSaveTasks();
+            if (document.getElementById('analysisSection').style.display !== 'none') {
+                updateAnalytics();
+            }
+        };
+    </script>
+</body>
+</html> 

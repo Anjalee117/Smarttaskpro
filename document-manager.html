@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Manager - SmartTask Pro</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
+    <!-- Tesseract.js for OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.3/dist/tesseract.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #06B6D4;
+            --background-color: #F3F4F6;
+            --card-background: #FFFFFF;
+            --text-color: #1F2937;
+            --gradient-1: linear-gradient(135deg, #4F46E5, #06B6D4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--card-background);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            height: calc(100vh - 70px);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: var(--card-background);
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-btn {
+            background: var(--gradient-1);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: opacity 0.3s;
+        }
+
+        .upload-btn:hover {
+            opacity: 0.9;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem;
+            padding-left: 2.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6B7280;
+        }
+
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .file-item:hover {
+            background-color: var(--background-color);
+        }
+
+        .file-icon {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        /* Main Viewer Styles */
+        .document-viewer {
+            background: var(--card-background);
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .viewer-toolbar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .toolbar-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: white;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--background-color);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .pdf-container {
+            flex: 1;
+            overflow-y: auto;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        #pdfViewer {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Cloud Storage Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .cloud-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .cloud-option {
+            padding: 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cloud-option:hover {
+            border-color: var(--primary-color);
+            background: var(--background-color);
+        }
+
+        .cloud-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        /* Annotation Styles */
+        .annotation-toolbar {
+            position: absolute;
+            top: 50%;
+            right: -40px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .annotation-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 4px;
+            background: var(--background-color);
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .annotation-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Loading Indicator */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1 class="logo">SmartTask Pro</h1>
+        <button onclick="window.location.href='dashboard.html'" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <button class="upload-btn" onclick="handleFileUpload()">
+                <i class="fas fa-upload"></i>
+                Upload Document
+            </button>
+            <input type="file" id="fileInput" style="display: none" accept=".pdf,.doc,.docx" onchange="uploadFile(event)">
+            
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search documents..." onkeyup="searchDocuments(event)">
+            </div>
+
+            <div class="file-list" id="fileList">
+                <!-- Files will be listed here -->
+            </div>
+        </div>
+
+        <!-- Document Viewer -->
+        <div class="document-viewer">
+            <div class="viewer-toolbar">
+                <button class="toolbar-btn" onclick="zoomIn()">
+                    <i class="fas fa-search-plus"></i> Zoom In
+                </button>
+                <button class="toolbar-btn" onclick="zoomOut()">
+                    <i class="fas fa-search-minus"></i> Zoom Out
+                </button>
+                <button class="toolbar-btn" onclick="toggleAnnotations()">
+                    <i class="fas fa-highlighter"></i> Annotate
+                </button>
+                <button class="toolbar-btn" onclick="showCloudSync()">
+                    <i class="fas fa-cloud-upload-alt"></i> Cloud Sync
+                </button>
+                <button class="toolbar-btn" onclick="extractText()">
+                    <i class="fas fa-font"></i> Extract Text
+                </button>
+            </div>
+
+            <div class="pdf-container">
+                <canvas id="pdfViewer"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <!-- Cloud Storage Modal -->
+    <div class="modal" id="cloudModal">
+        <div class="modal-content">
+            <h2>Choose Cloud Storage</h2>
+            <div class="cloud-options">
+                <div class="cloud-option" onclick="connectToGoogleDrive()">
+                    <i class="fab fa-google-drive cloud-icon"></i>
+                    <h3>Google Drive</h3>
+                </div>
+                <div class="cloud-option" onclick="connectToDropbox()">
+                    <i class="fab fa-dropbox cloud-icon"></i>
+                    <h3>Dropbox</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div class="loading" id="loadingIndicator">
+        <i class="fas fa-spinner"></i>
+        <p>Processing...</p>
+    </div>
+
+    <script>
+        // Initialize PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let currentPdf = null;
+        let currentPage = 1;
+        let currentZoom = 1.0;
+        let isAnnotationMode = false;
+
+        // Handle file upload button click
+        function handleFileUpload() {
+            document.getElementById('fileInput').click();
+        }
+
+        // Upload and process file
+        async function uploadFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showLoading();
+
+            try {
+                if (file.type === 'application/pdf') {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                    currentPdf = pdf;
+                    renderPage(1);
+                }
+
+                // Add file to list
+                addFileToList(file.name);
+
+                // Store file in localStorage (in practice, you'd use a proper backend)
+                const files = JSON.parse(localStorage.getItem('documents') || '[]');
+                files.push({
+                    name: file.name,
+                    date: new Date().toISOString(),
+                    type: file.type
+                });
+                localStorage.setItem('documents', JSON.stringify(files));
+
+            } catch (error) {
+                console.error('Error processing file:', error);
+                alert('Error processing file. Please try again.');
+            }
+
+            hideLoading();
+        }
+
+        // Render PDF page
+        async function renderPage(pageNumber) {
+            if (!currentPdf) return;
+
+            const page = await currentPdf.getPage(pageNumber);
+            const canvas = document.getElementById('pdfViewer');
+            const context = canvas.getContext('2d');
+
+            const viewport = page.getViewport({ scale: currentZoom });
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            await page.render({
+                canvasContext: context,
+                viewport: viewport
+            }).promise;
+        }
+
+        // Add file to list
+        function addFileToList(fileName) {
+            const fileList = document.getElementById('fileList');
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <i class="fas fa-file-pdf file-icon"></i>
+                <span>${fileName}</span>
+            `;
+            fileList.appendChild(fileItem);
+        }
+
+        // OCR text extraction
+        async function extractText() {
+            if (!currentPdf) {
+                alert('Please open a document first');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const canvas = document.getElementById('pdfViewer');
+                const result = await Tesseract.recognize(canvas);
+                console.log('Extracted text:', result.data.text);
+                alert('Text extracted successfully! Check console for results.');
+            } catch (error) {
+                console.error('OCR Error:', error);
+                alert('Error extracting text. Please try again.');
+            }
+
+            hideLoading();
+        }
+
+        // Zoom controls
+        function zoomIn() {
+            currentZoom += 0.2;
+            renderPage(currentPage);
+        }
+
+        function zoomOut() {
+            currentZoom = Math.max(0.4, currentZoom - 0.2);
+            renderPage(currentPage);
+        }
+
+        // Annotation controls
+        function toggleAnnotations() {
+            isAnnotationMode = !isAnnotationMode;
+            const canvas = document.getElementById('pdfViewer');
+            canvas.style.cursor = isAnnotationMode ? 'crosshair' : 'default';
+        }
+
+        // Cloud sync modal
+        function showCloudSync() {
+            document.getElementById('cloudModal').style.display = 'flex';
+        }
+
+        // Connect to cloud services
+        function connectToGoogleDrive() {
+            // Implement Google Drive API integration
+            alert('Google Drive integration coming soon!');
+        }
+
+        function connectToDropbox() {
+            // Implement Dropbox API integration
+            alert('Dropbox integration coming soon!');
+        }
+
+        // Search documents
+        function searchDocuments(event) {
+            const searchTerm = event.target.value.toLowerCase();
+            const fileItems = document.querySelectorAll('.file-item');
+            
+            fileItems.forEach(item => {
+                const fileName = item.querySelector('span').textContent.toLowerCase();
+                item.style.display = fileName.includes(searchTerm) ? 'flex' : 'none';
+            });
+        }
+
+        // Loading indicator
+        function showLoading() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved documents
+            const files = JSON.parse(localStorage.getItem('documents') || '[]');
+            files.forEach(file => addFileToList(file.name));
+
+            // Close cloud modal when clicking outside
+            document.getElementById('cloudModal').addEventListener('click', (e) => {
+                if (e.target.id === 'cloudModal') {
+                    e.target.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

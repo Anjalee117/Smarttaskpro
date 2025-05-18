@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer - SmartTask Pro</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for productivity reports -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #06B6D4;
+            --background-color: #F3F4F6;
+            --card-background: #FFFFFF;
+            --text-color: #1F2937;
+            --gradient-1: linear-gradient(135deg, #4F46E5, #06B6D4);
+            --work-color: #4F46E5;
+            --break-color: #10B981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--card-background);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .timer-section {
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .timer-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 6rem;
+            margin: 2rem 0;
+            color: var(--work-color);
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .timer-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .start-btn {
+            background: var(--work-color);
+            color: white;
+        }
+
+        .pause-btn {
+            background: var(--break-color);
+            color: white;
+        }
+
+        .reset-btn {
+            background: #EF4444;
+            color: white;
+        }
+
+        .settings-section {
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .settings-form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .stats-section {
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            grid-column: span 2;
+        }
+
+        .stats-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--background-color);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-section {
+                grid-column: span 1;
+            }
+
+            .timer-display {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1 class="logo">SmartTask Pro</h1>
+        <button onclick="window.location.href='dashboard.html'" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Timer Section -->
+        <div class="timer-section">
+            <h2>Pomodoro Timer</h2>
+            <div class="timer-display" id="timer">25:00</div>
+            <div class="timer-controls">
+                <button class="timer-btn start-btn" id="startBtn">
+                    <i class="fas fa-play"></i> Start
+                </button>
+                <button class="timer-btn pause-btn" id="pauseBtn" disabled>
+                    <i class="fas fa-pause"></i> Pause
+                </button>
+                <button class="timer-btn reset-btn" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+            <div id="currentTask">
+                Current Task: <span id="taskName">None</span>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="settings-section">
+            <h2 class="settings-title">Settings</h2>
+            <form class="settings-form" id="settingsForm">
+                <div class="form-group">
+                    <label for="workDuration">Work Duration (minutes)</label>
+                    <input type="number" id="workDuration" value="25" min="1" max="60">
+                </div>
+                <div class="form-group">
+                    <label for="breakDuration">Break Duration (minutes)</label>
+                    <input type="number" id="breakDuration" value="5" min="1" max="30">
+                </div>
+                <div class="form-group">
+                    <label for="autoStart">Auto-start next session</label>
+                    <select id="autoStart">
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+                <button type="submit" class="timer-btn start-btn">Save Settings</button>
+            </form>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <h2 class="stats-title">Productivity Stats</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPomodoros">0</div>
+                    <div class="stat-label">Pomodoros Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalTime">0h</div>
+                    <div class="stat-label">Total Focus Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="dailyAverage">0</div>
+                    <div class="stat-label">Daily Average</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="productivityChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let timer;
+        let timeLeft;
+        let isRunning = false;
+        let isWorkTime = true;
+        let stats = JSON.parse(localStorage.getItem('pomodoroStats')) || {
+            pomodoros: 0,
+            totalMinutes: 0,
+            dailyStats: {},
+            taskStats: {}
+        };
+
+        // Initialize settings
+        const settings = {
+            workDuration: 25,
+            breakDuration: 5,
+            autoStart: true
+        };
+
+        // Timer display element
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Format time for display
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        // Start timer
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                
+                timer = setInterval(() => {
+                    timeLeft--;
+                    timerDisplay.textContent = formatTime(timeLeft);
+
+                    if (timeLeft === 0) {
+                        clearInterval(timer);
+                        handleTimerComplete();
+                    }
+                }, 1000);
+            }
+        }
+
+        // Pause timer
+        function pauseTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+        }
+
+        // Reset timer
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            isWorkTime = true;
+            timeLeft = settings.workDuration * 60;
+            timerDisplay.textContent = formatTime(timeLeft);
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            timerDisplay.style.color = 'var(--work-color)';
+        }
+
+        // Handle timer completion
+        function handleTimerComplete() {
+            if (isWorkTime) {
+                // Update stats
+                stats.pomodoros++;
+                stats.totalMinutes += settings.workDuration;
+                const today = new Date().toISOString().split('T')[0];
+                stats.dailyStats[today] = (stats.dailyStats[today] || 0) + 1;
+                
+                // Save stats
+                localStorage.setItem('pomodoroStats', JSON.stringify(stats));
+                updateStats();
+
+                // Switch to break
+                isWorkTime = false;
+                timeLeft = settings.breakDuration * 60;
+                timerDisplay.style.color = 'var(--break-color)';
+            } else {
+                // Switch back to work
+                isWorkTime = true;
+                timeLeft = settings.workDuration * 60;
+                timerDisplay.style.color = 'var(--work-color)';
+            }
+
+            // Auto-start if enabled
+            if (settings.autoStart) {
+                startTimer();
+            } else {
+                timerDisplay.textContent = formatTime(timeLeft);
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+            }
+        }
+
+        // Update stats display
+        function updateStats() {
+            document.getElementById('totalPomodoros').textContent = stats.pomodoros;
+            document.getElementById('totalTime').textContent = `${Math.round(stats.totalMinutes / 60)}h`;
+            
+            // Calculate daily average
+            const days = Object.keys(stats.dailyStats).length || 1;
+            document.getElementById('dailyAverage').textContent = 
+                Math.round(stats.pomodoros / days);
+
+            // Update chart
+            updateChart();
+        }
+
+        // Update productivity chart
+        function updateChart() {
+            const ctx = document.getElementById('productivityChart').getContext('2d');
+            const dates = Object.keys(stats.dailyStats).slice(-7);
+            const counts = dates.map(date => stats.dailyStats[date] || 0);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dates.map(date => new Date(date).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Pomodoros Completed',
+                        data: counts,
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+
+        document.getElementById('settingsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            settings.workDuration = parseInt(document.getElementById('workDuration').value);
+            settings.breakDuration = parseInt(document.getElementById('breakDuration').value);
+            settings.autoStart = document.getElementById('autoStart').value === 'true';
+            resetTimer();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load current task if any
+            const currentTask = JSON.parse(localStorage.getItem('currentPomodoroTask'));
+            if (currentTask) {
+                document.getElementById('taskName').textContent = currentTask.title;
+            }
+
+            resetTimer();
+            updateStats();
+        });
+    </script>
+</body>
+</html> 

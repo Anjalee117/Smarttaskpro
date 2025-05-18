@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant - SmartTask Pro</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #06B6D4;
+            --background-color: #F3F4F6;
+            --card-background: #FFFFFF;
+            --text-color: #1F2937;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --error-color: #EF4444;
+            --gradient-1: linear-gradient(135deg, #4F46E5, #06B6D4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--card-background);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .main-content {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .dashboard-card {
+            background: var(--card-background);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: #6B7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .chat-section {
+            grid-column: span 2;
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .chat-input button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .chat-input button:hover {
+            background: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-section {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="logo">SmartTask Pro</h1>
+        <button onclick="window.location.href='dashboard.html'" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </button>
+    </header>
+
+    <main class="main-content">
+        <!-- Task Completion Trends -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2 class="card-title">Task Completion Trends</h2>
+            </div>
+            <div class="chart-container">
+                <canvas id="completionTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Productivity Analysis -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2 class="card-title">Productivity Analysis</h2>
+            </div>
+            <div class="chart-container">
+                <canvas id="productivityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Time Distribution -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2 class="card-title">Time Distribution</h2>
+            </div>
+            <div class="chart-container">
+                <canvas id="timeDistributionChart"></canvas>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Most Productive Day</h3>
+                    <p>Tuesday</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Peak Hours</h3>
+                    <p>2-4 PM</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Insights -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2 class="card-title">AI Insights</h2>
+            </div>
+            <div class="chart-container">
+                <canvas id="insightsChart"></canvas>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Efficiency Score</h3>
+                    <p>85%</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Focus Time</h3>
+                    <p>6.2h</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Chat Assistant -->
+        <div class="dashboard-card chat-section">
+            <div class="card-header">
+                <h2 class="card-title">AI Assistant</h2>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <!-- Chat messages will be added here -->
+            </div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Ask me anything about your tasks...">
+                <button onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                    Send
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Load tasks from localStorage
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || {
+            active: [],
+            recurring: [],
+            completed: []
+        };
+
+        // Initialize charts when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCharts();
+            addWelcomeMessage();
+        });
+
+        function initializeCharts() {
+            // Task Completion Trend Chart
+            const completionCtx = document.getElementById('completionTrendChart').getContext('2d');
+            new Chart(completionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Tasks Completed',
+                        data: [5, 8, 6, 9, 7, 4, 6],
+                        borderColor: '#4F46E5',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Weekly Task Completion'
+                        }
+                    }
+                }
+            });
+
+            // Productivity Chart
+            const productivityCtx = document.getElementById('productivityChart').getContext('2d');
+            new Chart(productivityCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Focus Time', 'Breaks', 'Meetings', 'Planning'],
+                    datasets: [{
+                        label: 'Hours Spent',
+                        data: [6.5, 1.5, 2, 1],
+                        backgroundColor: [
+                            '#4F46E5',
+                            '#06B6D4',
+                            '#10B981',
+                            '#F59E0B'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Daily Time Distribution'
+                        }
+                    }
+                }
+            });
+
+            // Time Distribution Chart
+            const timeCtx = document.getElementById('timeDistributionChart').getContext('2d');
+            new Chart(timeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Morning', 'Afternoon', 'Evening'],
+                    datasets: [{
+                        data: [35, 45, 20],
+                        backgroundColor: [
+                            '#4F46E5',
+                            '#06B6D4',
+                            '#10B981'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Productivity by Time of Day'
+                        }
+                    }
+                }
+            });
+
+            // AI Insights Chart
+            const insightsCtx = document.getElementById('insightsChart').getContext('2d');
+            new Chart(insightsCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Focus', 'Efficiency', 'Planning', 'Execution', 'Balance'],
+                    datasets: [{
+                        label: 'Current Week',
+                        data: [85, 78, 92, 75, 88],
+                        borderColor: '#4F46E5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Performance Metrics'
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chat functionality
+        function addWelcomeMessage() {
+            const chatMessages = document.getElementById('chatMessages');
+            const welcomeMessage = document.createElement('div');
+            welcomeMessage.style.padding = '10px';
+            welcomeMessage.style.marginBottom = '10px';
+            welcomeMessage.style.backgroundColor = '#e5e7eb';
+            welcomeMessage.style.borderRadius = '8px';
+            welcomeMessage.innerHTML = 'Hello! I\'m your AI assistant. How can I help you with your tasks today?';
+            chatMessages.appendChild(welcomeMessage);
+        }
+
+        function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const chatMessages = document.getElementById('chatMessages');
+            const message = userInput.value.trim();
+
+            if (message) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.style.padding = '10px';
+                userMessage.style.marginBottom = '10px';
+                userMessage.style.backgroundColor = '#dbeafe';
+                userMessage.style.borderRadius = '8px';
+                userMessage.style.textAlign = 'right';
+                userMessage.innerHTML = `<strong>You:</strong> ${message}`;
+                chatMessages.appendChild(userMessage);
+
+                // Clear input
+                userInput.value = '';
+
+                // Generate AI response
+                setTimeout(() => {
+                    const aiResponse = generateAIResponse(message);
+                    const aiMessage = document.createElement('div');
+                    aiMessage.style.padding = '10px';
+                    aiMessage.style.marginBottom = '10px';
+                    aiMessage.style.backgroundColor = '#e5e7eb';
+                    aiMessage.style.borderRadius = '8px';
+                    aiMessage.innerHTML = `<strong>AI:</strong> ${aiResponse}`;
+                    chatMessages.appendChild(aiMessage);
+                    
+                    // Scroll to bottom
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+            }
+        }
+
+        function generateAIResponse(message) {
+            // Check for specific actions in the message
+            if (message.toLowerCase().includes('create') || message.toLowerCase().includes('new task')) {
+                return createNewTask();
+            } else if (message.toLowerCase().includes('view') || message.toLowerCase().includes('show') || message.toLowerCase().includes('list')) {
+                return viewExistingTasks();
+            } else if (message.toLowerCase().includes('recommend')) {
+                return getTaskRecommendations();
+            }
+
+            // Enhanced mock responses based on keywords
+            const responses = {
+                'task': 'Here are your options:\n1. Type "create task" to add a new task\n2. Type "view tasks" to see your current tasks\n3. Type "recommendations" for task management suggestions\nWhat would you like to do?',
+                'deadline': 'Based on your current tasks and schedule, I recommend setting realistic deadlines and breaking down large tasks into smaller, manageable chunks.',
+                'productivity': 'To improve productivity, try using the Pomodoro technique with focused work sessions. Your most productive hours are typically between 2-4 PM.',
+                'help': 'I can help you with task management, productivity analysis, time tracking, and providing insights about your work patterns. What would you like to know?',
+                'schedule': 'Looking at your schedule, you have several tasks planned. Would you like to see your task distribution or get recommendations for optimal scheduling?',
+                'critical': analyzeCriticalTasks(),
+                'priority': analyzeCriticalTasks(),
+                'important': analyzeCriticalTasks(),
+                'urgent': analyzeCriticalTasks()
+            };
+
+            // Check for keywords in the message
+            for (const [keyword, reply] of Object.entries(responses)) {
+                if (message.toLowerCase().includes(keyword)) {
+                    return reply;
+                }
+            }
+
+            // If no matching response is found, return the "not programmed" message
+            return "I apologize, but I'm not yet programmed to handle this type of question. I can help you with:\n\n" +
+                   "1. Task management (create, view, or list tasks)\n" +
+                   "2. Priority and deadline tracking\n" +
+                   "3. Productivity recommendations\n" +
+                   "4. Schedule analysis\n\n" +
+                   "Please try asking about one of these topics or type 'help' for more information.";
+        }
+
+        function createNewTask() {
+            const taskInput = document.createElement('div');
+            taskInput.innerHTML = `
+                <div style="margin-top: 10px;">
+                    <input type="text" id="newTaskTitle" placeholder="Task title" style="width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 4px;">
+                    <select id="newTaskPriority" style="width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 4px;">
+                        <option value="3">High Priority</option>
+                        <option value="2">Medium Priority</option>
+                        <option value="1">Low Priority</option>
+                    </select>
+                    <input type="date" id="newTaskDeadline" style="width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 4px;">
+                    <button onclick="submitNewTask()" style="width: 100%; padding: 8px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">Add Task</button>
+                </div>
+            `;
+            
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.appendChild(taskInput);
+            
+            return "Please fill in the task details above to create a new task.";
+        }
+
+        function submitNewTask() {
+            const title = document.getElementById('newTaskTitle').value;
+            const priority = parseInt(document.getElementById('newTaskPriority').value);
+            const deadline = document.getElementById('newTaskDeadline').value;
+
+            if (!title) {
+                return;
+            }
+
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || {
+                active: [],
+                recurring: [],
+                completed: []
+            };
+
+            tasks.active.push({
+                title,
+                priority,
+                deadline,
+                created: new Date().toISOString()
+            });
+
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+
+            // Add confirmation message
+            const chatMessages = document.getElementById('chatMessages');
+            const confirmationMessage = document.createElement('div');
+            confirmationMessage.style.padding = '10px';
+            confirmationMessage.style.marginBottom = '10px';
+            confirmationMessage.style.backgroundColor = '#e5e7eb';
+            confirmationMessage.style.borderRadius = '8px';
+            confirmationMessage.innerHTML = `<strong>AI:</strong> Task "${title}" has been created successfully! Would you like to create another task or view your task list?`;
+            chatMessages.appendChild(confirmationMessage);
+
+            // Remove the task input form
+            document.getElementById('newTaskTitle').parentElement.remove();
+        }
+
+        function viewExistingTasks() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || {
+                active: [],
+                recurring: [],
+                completed: []
+            };
+
+            if (tasks.active.length === 0) {
+                return "You don't have any active tasks. Would you like to create a new task?";
+            }
+
+            // Sort tasks by priority and deadline
+            const sortedTasks = tasks.active.sort((a, b) => {
+                if (a.priority !== b.priority) {
+                    return b.priority - a.priority;
+                }
+                return new Date(a.deadline) - new Date(b.deadline);
+            });
+
+            let taskList = "Here are your current tasks:\n\n";
+            sortedTasks.forEach((task, index) => {
+                const priority = ['', 'Low', 'Medium', 'High'][task.priority];
+                taskList += `${index + 1}. ${task.title}\n   Priority: ${priority}\n   ${task.deadline ? `Deadline: ${new Date(task.deadline).toLocaleDateString()}` : 'No deadline set'}\n\n`;
+            });
+
+            return taskList + "\nWould you like to create a new task or get task recommendations?";
+        }
+
+        function getTaskRecommendations() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || {
+                active: [],
+                recurring: [],
+                completed: []
+            };
+
+            if (tasks.active.length === 0) {
+                return "You don't have any active tasks. Here are some general recommendations:\n\n1. Start by creating small, achievable tasks\n2. Set clear deadlines for each task\n3. Prioritize tasks based on importance and urgency\n\nWould you like to create your first task?";
+            }
+
+            // Analyze tasks and provide personalized recommendations
+            const highPriorityTasks = tasks.active.filter(task => task.priority === 3);
+            const upcomingDeadlines = tasks.active.filter(task => task.deadline && new Date(task.deadline) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+
+            let recommendations = "Here are your personalized task recommendations:\n\n";
+
+            if (highPriorityTasks.length > 0) {
+                recommendations += "1. Focus on these high-priority tasks first:\n";
+                highPriorityTasks.forEach(task => {
+                    recommendations += `   - ${task.title}\n`;
+                });
+                recommendations += "\n";
+            }
+
+            if (upcomingDeadlines.length > 0) {
+                recommendations += "2. Tasks due within the next week:\n";
+                upcomingDeadlines.forEach(task => {
+                    recommendations += `   - ${task.title} (Due: ${new Date(task.deadline).toLocaleDateString()})\n`;
+                });
+                recommendations += "\n";
+            }
+
+            recommendations += "3. General recommendations:\n";
+            recommendations += "   - Break down large tasks into smaller subtasks\n";
+            recommendations += "   - Use the Pomodoro technique for focused work sessions\n";
+            recommendations += "   - Review and update task priorities regularly\n\n";
+
+            return recommendations + "Would you like to view your full task list or create a new task?";
+        }
+
+        function analyzeCriticalTasks() {
+            // Get tasks from localStorage
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || {
+                active: [],
+                recurring: [],
+                completed: []
+            };
+
+            // If there are active tasks, analyze them
+            if (tasks.active.length > 0) {
+                // Sort tasks by priority and deadline
+                const sortedTasks = tasks.active.sort((a, b) => {
+                    if (a.priority !== b.priority) {
+                        return b.priority - a.priority; // Higher priority first
+                    }
+                    return new Date(a.deadline) - new Date(b.deadline); // Earlier deadline first
+                });
+
+                const mostCritical = sortedTasks[0];
+                if (mostCritical) {
+                    return `Based on priority and deadlines, your most critical task is "${mostCritical.title}". ${
+                        mostCritical.deadline ? `This task is due on ${new Date(mostCritical.deadline).toLocaleDateString()}.` : ''
+                    } Would you like to see the full list of priority tasks?`;
+                }
+            }
+
+            // If no tasks found, provide a default response
+            return "I don't see any critical tasks in your current list. Would you like to add a new task or review your task management strategy?";
+        }
+
+        // Add event listener for Enter key
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - SmartTask Pro</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #06B6D4;
+            --background-color: #F3F4F6;
+            --card-background: #FFFFFF;
+            --text-color: #1F2937;
+            --gradient-1: linear-gradient(135deg, #4F46E5, #06B6D4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--card-background);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem;
+            background: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: #4B5563;
+            margin-bottom: 2rem;
+        }
+
+        .section {
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-left: 1rem;
+        }
+
+        .feature-list li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: "•";
+            color: var(--primary-color);
+            position: absolute;
+            left: -1rem;
+        }
+
+        .stats-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--gradient-1);
+            color: white;
+            border-radius: 15px;
+            margin: 3rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .solution-card {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .solution-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .tech-badge {
+            background: #f1f5f9;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .main-content {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="logo">SmartTask Pro</h1>
+        <button onclick="window.location.href='dashboard.html'" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </button>
+    </header>
+
+    <main class="main-content">
+        <section class="hero-section">
+            <h1 class="hero-title">🚀 SmartTask Pro</h1>
+            <p class="hero-subtitle">Your All-in-One Productivity Hub</p>
+            <p>Welcome to SmartTask Pro – where productivity meets simplicity. Our platform helps you organize tasks, boost focus, and achieve more with powerful tools tailored for modern workflows.</p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">🎯 Our Mission</h2>
+            <p>To empower individuals and teams to take control of their time through intuitive task management, AI-driven insights, and distraction-free workflows.</p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">🌟 Key Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-tasks feature-icon"></i>
+                    <h3 class="feature-title">Smart Task Manager</h3>
+                    <ul class="feature-list">
+                        <li>Real-time deadline tracking with a dynamic clock widget</li>
+                        <li>Recurring tasks column (daily, weekly, monthly)</li>
+                        <li>Drag-and-drop prioritization & subtask dependencies</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <i class="fas fa-clock feature-icon"></i>
+                    <h3 class="feature-title">Focus Toolkit</h3>
+                    <ul class="feature-list">
+                        <li>Customizable Pomodoro timer with auto task-switching</li>
+                        <li>Focus Mode with minimalist UI and ambient sounds</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <i class="fas fa-robot feature-icon"></i>
+                    <h3 class="feature-title">AI Assistant</h3>
+                    <ul class="feature-list">
+                        <li>Auto-prioritize tasks based on deadlines and behavior</li>
+                        <li>Accepts natural language input</li>
+                        <li>Weekly productivity reports with actionable insights</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <i class="fas fa-folder-open feature-icon"></i>
+                    <h3 class="feature-title">Document Management</h3>
+                    <ul class="feature-list">
+                        <li>PDF/PPT previews with OCR-powered text search</li>
+                        <li>Cloud sync with Google Drive / Dropbox</li>
+                        <li>Version control</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <h2 class="section-title" style="color: white;">💡 Why Choose Us?</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">🔒</div>
+                    <div class="stat-label">Privacy First</div>
+                    <p>Your data stays yours – we never sell user info</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">📶</div>
+                    <div class="stat-label">Offline Access</div>
+                    <p>Work without internet (PWA supported)</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">🔁</div>
+                    <div class="stat-label">Cross-Device Sync</div>
+                    <p>Stay productive on any device</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">👥 Solutions We Offer</h2>
+            <div class="solutions-grid">
+                <div class="solution-card">
+                    <i class="fas fa-graduation-cap solution-icon"></i>
+                    <h3>For Students</h3>
+                    <p>Manage assignments & study sessions with the Pomodoro timer</p>
+                </div>
+                <div class="solution-card">
+                    <i class="fas fa-briefcase solution-icon"></i>
+                    <h3>For Professionals</h3>
+                    <p>Track projects and meetings with AI-powered scheduling</p>
+                </div>
+                <div class="solution-card">
+                    <i class="fas fa-users solution-icon"></i>
+                    <h3>For Teams</h3>
+                    <p>Collaborate with shared tasks and real-time progress tracking</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">🛠️ Behind the Scenes</h2>
+            <h3>Built With:</h3>
+            <div class="tech-stack">
+                <span class="tech-badge">React.js</span>
+                <span class="tech-badge">Firebase</span>
+                <span class="tech-badge">OpenAI API</span>
+                <span class="tech-badge">PDF.js</span>
+            </div>
+            <h3 style="margin-top: 2rem;">Upcoming Features 🚧</h3>
+            <div class="tech-stack">
+                <span class="tech-badge">Mobile app</span>
+                <span class="tech-badge">Team analytics</span>
+                <span class="tech-badge">Custom workflows</span>
+            </div>
+        </section>
+
+        <section class="section" style="text-align: center;">
+            <h2 class="section-title">🌍 Join Our Community</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 1rem;">100,000+ productive minds already trust SmartTask Pro.</p>
+            <p style="font-size: 1.5rem; color: var(--primary-color);">Start your journey today and make every task count.</p>
+        </section>
+    </main>
+</body>
+</html> 
